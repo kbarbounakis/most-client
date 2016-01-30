@@ -1,0 +1,15 @@
+{
+  "name": "most-client",
+  "version": "0.1.2",
+  "main": "./most-client.js",
+  "ignore": [],
+  "dependencies": {
+    "es5-shim":"~4.5.2",
+    "es6-shim":"~0.34.2"
+  },
+  "homepage": "https://github.com/kbarbounakis/most-client",
+  "_release": "0.1.2",
+  "_source": "git://github.com/kbarbounakis/most-client.git",
+  "_target": "~0.1.2",
+  "_originalSource": "most-client"
+}
