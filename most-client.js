@@ -119,7 +119,7 @@
         //
     }
 
-    var jQuery = this.jQuery;
+    var jQuery = this.jQuery, angular = this.angular;
     /**
      * Checks the expression and throws an exception if the condition is not met.
      * @param {*} expr
@@ -726,7 +726,6 @@
         var arr = [];
         delete this.$select;
         if (typeof attr === 'undefined' || attr == null) { return this; }
-        //backward compatibility (version <1.20)
         if (typeof attr ===  "[object Array]") {
             return ClientDataQueryable.prototype.select.apply(this, attr);
         }
@@ -751,7 +750,6 @@
         var arr = [];
         delete this.$groupby;
         if (typeof attr === 'undefined' || attr == null) { return this; }
-        //backward compatibility (version <1.20)
         if (typeof attr ===  "[object Array]") {
             return ClientDataQueryable.prototype.groupBy.apply(this, attr);
         }
@@ -776,7 +774,6 @@
         var arr = [];
         delete this.$expand;
         if (typeof attr === 'undefined' || attr == null) { return this; }
-        //backward compatibility (version <1.20)
         if (typeof attr ===  "[object Array]") {
             return ClientDataQueryable.prototype.expand.apply(this, attr);
         }
@@ -811,7 +808,7 @@
 
     ClientDataQueryable.prototype.prepare = function() {
         if (this.$filter) {
-            if (typeof this.$prepared === 'undefined' || this.$prepared === null) {
+            if (typeof this.$prepared === 'undefined' || this.$prepared == null) {
                 this.$prepared = this.$filter;
             }
             else {
@@ -908,6 +905,24 @@
         delete this.$skip;
         delete this.$inlinecount;
         this.$first = true;
+        return this.getService().execute({
+            method:"GET",
+            url:this.getUrl(),
+            data:this.copy()
+        });
+    };
+    /**
+     * @returns {Promise|*}
+     */
+    ClientDataQueryable.prototype.item = function() {
+        return this.first();
+    };
+    /**
+     * @returns {Promise|*}
+     */
+    ClientDataQueryable.prototype.items = function() {
+        delete this.$first;
+        this.$inlinecount = false;
         return this.getService().execute({
             method:"GET",
             url:this.getUrl(),
@@ -1479,9 +1494,102 @@
             base:"/"
         };
     }
-
     /**
      * END OF JQUERY IMPLEMENTATION
      */
 
+    /**
+     * ANGULAR IMPLEMENTATION
+     */
+    if (angular) {
+
+        /**
+         * @param {string} base
+         * @constructor
+         * @augments ClientDataService
+         */
+        function AngularDataService(base) {
+            this.getBase = function() {
+                if (/\/$/.test(base)) {
+                    return base;
+                }
+                else {
+                    return base.concat("/");
+                }
+            };
+            var cookie;
+            this.getCookie = function() {
+                return cookie;
+            };
+            this.setCookie = function(value) {
+                cookie = value;
+            };
+        }
+
+        /**
+         * @param {{method:string,url:string,data:*,headers:*}|*} options
+         * @returns {Promise|*}
+         */
+        AngularDataService.prototype.execute = function(options) {
+
+            var self = this,
+                $injector = angular.element(document.body).injector(),
+                $http = $injector.get("$http"),
+                $q = $injector.get("$q"),
+                deferred = $q.defer();
+            setTimeout(function() {
+                try {
+                    //options defaults
+                    options.method = options.method || "GET";
+                    options.headers = options.headers || { };
+                    //set content type
+                    options.headers["Content-Type"] = "application/json";
+                    //validate options URL
+                    Args.notNull(options.url,"Request URL");
+                    //validate URL format
+                    Args.check(!/^https?:\/\//i.test(options.url),"Request URL may not be an absolute URI");
+                    //validate request method
+                    Args.check(/^GET|POST|PUT|DELETE$/i.test(options.method),"Invalid request method. Expected GET, POST, PUT or DELETE.");
+                    var url_ = self.getBase() + options.url.replace(/^\//i,"");
+                    var o = {
+                        method: options.method,
+                        url: url_,
+                        headers:options.headers
+                    };
+                    if (/^GET$/.test(options.method)) {
+                        o.params = options.data;
+                    }
+                    else {
+                        o.data = options.data;
+                    }
+                    $http(o).then(function (response) {
+                        deferred.resolve(response.data);
+                    }, function (err) {
+                        deferred.reject(err);
+                    });
+                }
+                catch(e) {
+                    deferred.reject(e);
+                }
+            });
+            return deferred.promise;
+        };
+
+        var most = angular.module("most",[]);
+        /**
+         * @ngdoc service
+         * @name $context
+         * @description
+         * Use `$context` to access MOST Data Services.
+         * */
+        most.provider("$context", function ClientDataContextProvider() {
+            this.defaults = { base:"/" };
+            this.$get = function () {
+                var result = new ClientDataContext(this.defaults.base || "/");
+                result.setService(new AngularDataService(result.getBase()));
+                return result;
+            };
+        });
+
+    }
 })(this);
