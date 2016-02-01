@@ -5,6 +5,7 @@
   "ignore": [],
   "dependencies": {
     "es5-shim":"~4.5.2",
-    "es6-shim":"~0.34.2"
+    "es6-shim":"~0.34.2",
+    "jquery":"~2.1.3"
   }
 }
