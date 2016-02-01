@@ -68,6 +68,13 @@
         return Base64.decode(s);
     };
 
+    TextUtils.isNotEmptyString = function(s) {
+        if (typeof s === 'string') {
+            return (s.length>0);
+        }
+        return false;
+    };
+
     /**
      * @param {*...} f
      * @returns {string}
@@ -694,7 +701,7 @@
             else
                 expr = self.privates_.left + ' ' + self.privates_.op + ' ' + ClientDataQueryable.escape(self.privates_.right);
             if (expr) {
-                if (typeof self.$filter === 'undefined' || self.$filter === null)
+                if (typeof self.$filter === 'undefined' || self.$filter == null)
                     self.$filter = expr;
                 else {
                     self.privates_.lop = self.privates_.lop || 'and';
@@ -808,7 +815,7 @@
                 this.$prepared = this.$filter;
             }
             else {
-                this.$prepared = angular.format('(%s) and (%s)', this.$prepared, this.$filter);
+                this.$prepared = TextUtils.format('(%s) and (%s)', this.$prepared, this.$filter);
             }
             delete this.$filter;
         }
@@ -821,7 +828,7 @@
                 return this.$filter;
             }
             else {
-                return angular.format('(%s) and (%s)', this.$prepared, this.$filter);
+                return TextUtils.format('(%s) and (%s)', this.$prepared, this.$filter);
             }
         }
         else if(typeof this.$prepared !== 'undefined' && this.$prepared != null) {
@@ -1068,7 +1075,7 @@
     ClientDataQueryable.prototype.contains = function(value) {
         Args.notNull(this.privates_.left,"The left operand");
         this.privates_.op = 'ge';
-        this.privates_.left = angular.format('indexof(%s,%s)', this.privates_.left, ClientDataQueryable.escape(value));
+        this.privates_.left = TextUtils.format('indexof(%s,%s)', this.privates_.left, ClientDataQueryable.escape(value));
         this.privates_.right = 0;
         return this.append();
     };
@@ -1389,8 +1396,8 @@
             var self = this,
                 unirest = require("unirest"),
                 url = require("url"),
-                q = require("Q"),
-                deferred = q.defer();
+                Q = require("q"),
+                deferred = Q.defer();
             process.nextTick(function() {
                 try {
                     //options defaults
