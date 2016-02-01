@@ -1,5 +1,5 @@
 # most-client
-Most Web Framework Application Client Library
+A client library for connecting to a remote MOST Web application
 
 ## Installation
 
@@ -38,6 +38,17 @@ or:
             console.log(err);
         });
 
+Note: If you are intend to use client for cross domain requests enable the following features:
+
+    $.context.defaults = {
+        base:"http:/data.example.com/"
+    };
+
+    jQuery.ajaxSetup({
+            xhrFields: { withCredentials: true },
+            crossDomain: true
+        });
+
 ### Usage under AngularJS:
 
     angular.module("app",["most"])
@@ -53,3 +64,30 @@ or:
                     console.log(err);
                 });
         });
+
+Note: If you are intended to use client for cross domain requests enable the following features:
+
+    var app = angular.module("app",["most"]);
+    app.config(['$httpProvider', function($httpProvider) {
+        $httpProvider.defaults.withCredentials = true;
+    }
+    ]);
+
+    app.config(['$contextProvider', function($contextProvider) {
+        $contextProvider.defaults.base = "http://data.example.com/";
+    }]);
+
+### Authentication
+
+Use basic authentication (node.js, jQuery and AngularJS environment):
+
+    context.authenticate("alexis.rees@example.com","user").then(function() {
+        //
+    }).catch(function(err) {
+        console.log(err);
+    });
+
+Use cookie based authentication (node.js environment):
+
+    //get cookie from request
+    context.getService().setCookie(request.headers.cookie);
