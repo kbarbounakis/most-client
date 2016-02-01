@@ -38,7 +38,7 @@ or:
             console.log(err);
         });
 
- ### Usage under AngularJS:
+### Usage under AngularJS:
 
     angular.module("app",["most"])
         .controller("OrderController", function($context) {
