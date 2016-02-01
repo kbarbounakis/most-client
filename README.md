@@ -11,8 +11,8 @@ or:
 
 ### Usage under node.js:
 
-    var client = require("most-client");
-    client.context.model("Order")
+    var client = require("most-client"), context = client.context("http://data.example.com");
+        context.model("Order")
         .select("id","customer", "orderedDate", "orderNumber")
         .expand("customer")
         .where("orderStatus/alternateName")
