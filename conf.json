@@ -1,0 +1,13 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "include": ["./"],
+        "includePattern": ".+\\.js(doc)?$",
+        "exclude":[ ]
+    },
+    "opts": {
+        "readme":"README.md"
+    }
+}

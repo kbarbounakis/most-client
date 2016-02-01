@@ -76,7 +76,7 @@
     };
 
     /**
-     * @param {*...} f
+     * @param {...*} f
      * @returns {string}
      */
     TextUtils.format = function(f) {
@@ -675,13 +675,12 @@
         var self = this, exprs;
         if (self.privates_.left) {
             var expr = null;
-
             if (self.privates_.op=='in') {
                 if (Array.isArray(self.privates_.right)) {
                     //expand values
                     exprs = [];
                     self.privates_.right.forEach(function(x) {
-                        exprs.push(self.privates_.left + ' eq ' + ClientDataQueryable.escape(x));
+                        exprs.push(self.privates_.left + ' eq ' + ((typeof x === 'function') ? x.name + "()": ClientDataQueryable.escape(x)));
                     });
                     if (exprs.length>0)
                         expr = '(' + exprs.join(' or ') + ')';
@@ -692,14 +691,15 @@
                     //expand values
                     exprs = [];
                     self.privates_.right.forEach(function(x) {
-                        exprs.push(self.privates_.left + ' ne ' + ClientDataQueryable.escape(x));
+                        exprs.push(self.privates_.left + ' ne ' + ((typeof x === 'function') ? x.name + "()": ClientDataQueryable.escape(x)));
                     });
                     if (exprs.length>0)
                         expr = '(' + exprs.join(' and ') + ')';
                 }
             }
-            else
-                expr = self.privates_.left + ' ' + self.privates_.op + ' ' + ClientDataQueryable.escape(self.privates_.right);
+            else {
+                expr = self.privates_.left + ' ' + self.privates_.op + ' ' + ((typeof self.privates_.right === 'function') ? self.privates_.right.name + "()": ClientDataQueryable.escape(self.privates_.right));
+            }
             if (expr) {
                 if (typeof self.$filter === 'undefined' || self.$filter == null)
                     self.$filter = expr;
@@ -719,7 +719,7 @@
     };
 
     /**
-     * @param {string|FieldSelector...} attr
+     * @param {...string|FieldExpression} attr
      * @returns ClientDataQueryable
      */
     ClientDataQueryable.prototype.select = function(attr) {
@@ -738,12 +738,17 @@
             else
                 throw new Error("Invalid argument. Expected string.");
         }
-        if (arr.length >0) { this.$select = arr.join(",") }
+        if (arr.length >0) {
+            /**
+             * @private
+             */
+            this.$select = arr.join(",")
+        }
         return this;
     };
 
     /**
-     * @param {string|FieldSelector...} attr
+     * @param {...string|FieldSelector} attr
      * @returns ClientDataQueryable
      */
     ClientDataQueryable.prototype.groupBy = function(attr) {
@@ -762,12 +767,17 @@
             else
                 throw new Error("Invalid argument. Expected string.");
         }
-        if (arr.length >0) { this.$groupby = arr.join(",") }
+        if (arr.length >0) {
+            /**
+             * @private
+             */
+            this.$groupby = arr.join(",")
+        }
         return this;
     };
 
     /**
-     * @param {string...} attr
+     * @param {...string} attr
      * @returns ClientDataQueryable
      */
     ClientDataQueryable.prototype.expand = function(attr) {
@@ -1256,7 +1266,7 @@
     };
 
     /**
-     * @param {*...} s
+     * @param {...*} s
      * @returns {ClientDataQueryable}
      */
     ClientDataQueryable.prototype.concat = function(s) {
@@ -1325,7 +1335,7 @@
     };
 
     /**
-     * @param {string|FieldSelector...} attr
+     * @param {...string|FieldSelector} attr
      * @returns {ClientDataQueryable}
      */
     ClientDataModel.prototype.orderBy = function(attr) {
@@ -1333,7 +1343,7 @@
     };
 
     /**
-     * @param {string|FieldSelector...} attr
+     * @param {...string|FieldSelector} attr
      * @returns {ClientDataQueryable}
      */
     ClientDataModel.prototype.orderByDescending = function(attr) {
@@ -1341,7 +1351,7 @@
     };
 
     /**
-     * @param {string|FieldSelector...} attr
+     * @param {...string|FieldSelector} attr
      * @returns {ClientDataQueryable}
      */
     ClientDataModel.prototype.select = function(attr) {
@@ -1579,6 +1589,7 @@
         /**
          * @ngdoc service
          * @name $context
+         * @type ClientDataContext
          * @description
          * Use `$context` to access MOST Data Services.
          * */
@@ -1590,6 +1601,5 @@
                 return result;
             };
         });
-
     }
 })(this);
