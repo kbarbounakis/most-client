@@ -138,18 +138,6 @@ Associates the given ClientDataService instance with this data context.
 
 ### ClientDataModel Class
 
-#### schema()
-
-Returns the JSON schema of this data model.
-
-    context.model("Order").schema().then(function(result) {
-        result.attributes.forEach(function(x) {
-            console.log(x.name);
-        });
-    }).catch(function(err) {
-        console.log(err);
-    }
-
 #### asQueryable()
 
 Returns an instance of ClientDataQueryable class associated with this model.
@@ -167,9 +155,99 @@ Returns an instance of ClientDataQueryable class associated with this model.
             console.log(err);
     });
 
+#### getName()
+
+Gets a string which represents the name of this data model.
+
+#### getService()
+
+Gets the instance of ClientDataService associated with this data model.
+
+#### remove(obj)
+
+Removes the given item or array of items.
+
+    var order = {
+        id:1
+    };
+    context.model("Order").remove(order).then(function(result) {
+        //
+    }).catch(function(err) {
+        console.log(err);
+    }
+
+#### save(obj)
+
+Creates or updates the given item or array of items.
+
+    var order = {
+        id:1,
+        orderStatus:7
+    };
+    context.model("Order").save(order).then(function(result) {
+        //
+    }).catch(function(err) {
+        console.log(err);
+    }
+
+#### schema()
+
+Returns the JSON schema of this data model.
+
+    context.model("Order").schema().then(function(result) {
+        result.attributes.forEach(function(x) {
+            console.log(x.name);
+        });
+    }).catch(function(err) {
+        console.log(err);
+    }
+
+
+#### select(...attr)
+
+Initializes and returns an instance of ClientDataQueryable class by selecting an attribute or a collection of attributes.
+
+    $context.model("Order")
+        .select("id","customer","orderedItem","orderStatus")
+        .orderBy("orderDate")
+        .take(25)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+            console.log(err);
+    });
+
+#### skip(num)
+
+Initializes and returns an instance of ClientDataQueryable class by specifying the number of records to be skipped.
+
+    $context.model("Order")
+        .skip(10)
+        .take(10)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+            console.log(err);
+    });
+
+#### take(num)
+
+Initializes and returns an instance of ClientDataQueryable class by specifying the number of records to be taken.
+
+    $context.model("Order")
+        .take(10)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+            console.log(err);
+    });
+
 #### where(name)
 
-Initializes a ClientDataQueryable instance for getting data.
+Initializes and returns an instance of ClientDataQueryable class for getting data.
 
     $context.model("Order")
         .where("orderedItem/category").equal("Laptops")
@@ -181,3 +259,152 @@ Initializes a ClientDataQueryable instance for getting data.
             console.log(err);
     });
 
+### ClientDataQueryable Class
+
+ClientDataQueryable class enables developers to perform simple and extended queries against data models.
+The ClienDataQueryable class follows [DataQueryable](https://docs.themost.io/most-data/DataQueryable.html)
+which is introduced by [MOST Web Framework ORM server-side module](https://github.com/kbarbounakis/most-data).
+
+#### Logical Operators
+
+Or:
+
+    $context.model("Product")
+        .where("category").equal("Desktops")
+        .or("category").equal("Laptops")
+        .orderBy("price")
+        .take(5)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+And:
+
+    $context.model("Product")
+        .where("category").equal("Laptops")
+        .and("price").between(200,750)
+        .orderBy("price")
+        .take(5)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+#### Comparison Operators
+
+Equal:
+
+    $context.model("Order")
+            .where("id").equal(10)
+            .first()
+            .then(function (result) {
+                //
+            }).catch(function (err) {
+                console.log(err);
+        });
+
+Not equal:
+
+    $context.model("Order")
+            .where("orderStatus/alternateName").notEqual("OrderProblem")
+            orderByDescending("orderDate")
+            .take(10)
+            .then(function (result) {
+                //
+            }).catch(function (err) {
+                console.log(err);
+        });
+
+Greater than:
+
+    $context.model("Order")
+        .where("orderedItem/price").greaterThan(968)
+        .and("orderedItem/category").equal("Laptops")
+        .and("orderStatus/alternateName").notEqual("OrderCancelled")
+        .select("id",
+            "orderStatus/name as orderStatusName",
+            "customer/description as customerDescription",
+            "orderedItem")
+        .orderByDescending("orderDate")
+        .take(10)
+        .items()
+        .then(function (result) {
+            return done();
+        }).catch(function (err) {
+        console.log(err);
+        return done(err);
+    });
+
+Greater or equal:
+
+    $context.model("Product")
+        .where("price").greaterOrEqual(1395.9)
+        .orderByDescending("price")
+        .take(10)
+        .items()
+        .then(function (result) {
+           //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Lower than:
+
+    $context.model("Product")
+        .where("price").lowerThan(263.56)
+        .orderBy("price")
+        .take(10)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Lower or equal:
+
+    $context.model("Product")
+        .where("price").lowerOrEqual(263.56)
+        .and("price").greaterOrEqual(224.52)
+        .orderBy("price")
+        .take(5)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Contains:
+
+    $context.model("Product")
+        .where("name").contains("Book")
+        .and("category").equal("Laptops")
+        .orderBy("price")
+        .take(5)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Between:
+
+    $context.model("Product")
+        .where("category").equal("Laptops")
+        .or("category").equal("Desktops")
+        .andAlso("price").between(200,750)
+        .orderBy("price")
+        .take(5)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });

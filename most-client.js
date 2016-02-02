@@ -530,6 +530,14 @@
          * @private
          */
         this.privates_ = { };
+        /**
+         * Gets an instance of ClientDataService which represents the data service provider
+         * associated with this model
+         * @returns {ClientDataService|*}
+         */
+        this.getModel = function() {
+            return model;
+        };
         var svc_ = service;
         /**
          * Gets an instance of ClientDataService which represents the data service provider
@@ -838,21 +846,17 @@
 
     /**
      *
-     * @param s
+     * @param {string|FieldSelector} attr
      * @returns {ClientDataQueryable}
      */
-    ClientDataQueryable.prototype.andAlso = function(s) {
+    ClientDataQueryable.prototype.andAlso = function(attr) {
         var self = this;
-        if (typeof s !== 'string')
-            return self;
-        if (s.length==0)
-            return self;
+        Args.notEmpty(name,"The left operand of a logical expression");
         if (self.$filter) {
-            self.$filter = '(' + self.$filter + ') and (' + s + ')';
+            self.$filter = "(" + self.$filter + ")";
         }
-        var p = self.privates_;
-        p._lop = 'and';
-        delete p.left; delete p.right; delete p.op;
+        self.privates_.left = attr;
+        self.privates_.lop = 'and';
         return self;
     };
 
@@ -863,17 +867,12 @@
      */
     ClientDataQueryable.prototype.orElse = function(attr) {
         var self = this;
-        Args.notNull(attr,"Attribute");
-        if (typeof attr === 'string') {
-            Args.notEmpty(attr,"Attribute");
+        Args.notEmpty(name,"The left operand of a logical expression");
+        if (self.$filter) {
+            self.$filter = "(" + self.$filter + ")";
         }
-        if (self.$filter)
-            self.$filter = '(' + self.$filter + ') or (' + attr + ')';
-        else
-            self.$filter = attr;
-        var p = self.privates_;
-        p._lop = 'or';
-        delete p.left; delete p.right; delete p.op;
+        self.privates_.left = attr;
+        self.privates_.lop = 'or';
         return self;
     };
 
@@ -1084,6 +1083,28 @@
     ClientDataQueryable.prototype.lowerOrEqual = function(value) {
         Args.notNull(this.privates_.left,"The left operand");
         this.privates_.op = 'le';this.privates_.right = value; return this.append();
+    };
+
+    /**
+     * @param {*} value1
+     * @param {*} value2
+     * @returns ClientDataQueryable
+     */
+    ClientDataQueryable.prototype.between = function(value1, value2) {
+        var self = this;
+        Args.notNull(self.privates_.left,"The left operand");
+        //generate new filter
+        var s = ClientDataQueryable.create(self.getModel())
+            .where(this.privates_.left).greaterOrEqual(value1)
+            .and(this.privates_.left).lowerOrEqual(value2).toFilter();
+        if (this.$filter) {
+            this.$filter = "(" + this.$filter + ") " + this.privates_.lop + " (" + s + ")";
+        }
+        else {
+            this.$filter = "(" + s + ")";
+        }
+        delete self.privates_.lop;delete self.privates_.left; delete self.privates_.op; delete self.privates_.right;
+        return this;
     };
 
     /**
@@ -1341,31 +1362,8 @@
      * @param {...string|FieldSelector} attr
      * @returns {ClientDataQueryable}
      */
-    ClientDataModel.prototype.orderBy = function(attr) {
-        return ClientDataQueryable.prototype.orderBy.apply(this.asQueryable(),arguments);
-    };
-
-    /**
-     * @param {...string|FieldSelector} attr
-     * @returns {ClientDataQueryable}
-     */
-    ClientDataModel.prototype.orderByDescending = function(attr) {
-        return ClientDataQueryable.prototype.orderByDescending.apply(this.asQueryable(),arguments);
-    };
-
-    /**
-     * @param {...string|FieldSelector} attr
-     * @returns {ClientDataQueryable}
-     */
     ClientDataModel.prototype.select = function(attr) {
         return ClientDataQueryable.prototype.select.apply(this.asQueryable(),arguments);
-    };
-
-    /**
-     * @returns {Promise|*}
-     */
-    ClientDataModel.prototype.first = function() {
-        return this.asQueryable().first();
     };
 
     /**
@@ -1382,13 +1380,6 @@
      */
     ClientDataModel.prototype.take = function(val) {
         return this.asQueryable().take(val);
-    };
-
-    /**
-     * @returns {Promise|*}
-     */
-    ClientDataModel.prototype.list = function() {
-        return this.asQueryable().list();
     };
 
     /**
