@@ -1,5 +1,5 @@
 # most-client
-A client library for connecting to a remote []MOST Web Framework](https://github.com/kbarbounakis/most-web) application
+A client library for connecting to a remote [MOST Web Framework](https://github.com/kbarbounakis/most-web) application
 
 ![MOST Web Framework Logo](https://www.themost.io/assets/images/most_logo_sw_240.png)
 
