@@ -506,27 +506,6 @@
     };
 
     /**
-     * @param {string} expr
-     * @constructor
-     */
-    function FieldExpression(expr) {
-        this.expr = expr;
-    }
-
-    FieldExpression.prototype.toString = function() {
-        return this.expr;
-    };
-
-    /**
-     * @param {string} expr
-     * @returns {FieldExpression}
-     */
-    FieldExpression.create = function(expr) {
-        return new FieldExpression(expr);
-    };
-
-
-    /**
      * @param {string} model - The target model
      * @param {ClientDataService|*=} service - The underlying data service
      * @constructor
@@ -719,7 +698,7 @@
     };
 
     /**
-     * @param {...string|FieldExpression} attr
+     * @param {...string|FieldSelector} attr
      * @returns ClientDataQueryable
      */
     ClientDataQueryable.prototype.select = function(attr) {
@@ -1301,6 +1280,16 @@
             return service;
         };
     }
+
+    /**
+     * @returns {Promise|*}
+     */
+    ClientDataModel.prototype.schema = function() {
+        return this.getService().execute({
+            method:"GET",
+            url: TextUtils.format("/%/schema.json", this.getName())
+        });
+    };
 
     /**
      * Gets an instance of ClientDataQueryable based on the current model

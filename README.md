@@ -1,6 +1,8 @@
 # most-client
 A client library for connecting to a remote MOST Web application
 
+![MOST Web Framework Logo](https://www.themost.io/assets/images/most_logo_sw_240.png)
+
 ## Installation
 
     npm install most-client
