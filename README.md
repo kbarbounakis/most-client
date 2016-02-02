@@ -409,3 +409,46 @@ Between:
         }).catch(function (err) {
         console.log(err);
     });
+
+#### Aggregations
+
+Count:
+
+    $context.model("Product")
+        .select("category", "count(id) as total")
+        .groupBy("category")
+        .orderByDescending("count(id)")
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Min:
+
+    $context.model("Product")
+        .select("category", "min(price) as minimumPrice")
+        .where("category").equal("Laptops")
+        .or("category").equal("Desktops")
+        .groupBy("category")
+        .orderByDescending("min(price)")
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Max:
+
+    $context.model("Product")
+        .select("category", "max(price) as maximumPrice")
+        .where("category").equal("Laptops")
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
