@@ -116,7 +116,7 @@ Use cookie based authentication (node.js environment):
 
 #### model(name)
 
-Get an instance of ClientDataModel class based on the given name.
+Gets an instance of ClientDataModel class based on the given name.
 
     context.model("Order").where("orderStatus").equal(1).items().then(function(result) {
         //
@@ -245,9 +245,10 @@ Initializes and returns an instance of ClientDataQueryable class by specifying t
             console.log(err);
     });
 
-#### where(name)
+#### where(attr)
 
-Initializes and returns an instance of ClientDataQueryable class for getting data.
+Initializes a comparison expression by using the given attribute as left operand
+and returns an instance of ClientDataQueryable class.
 
     $context.model("Order")
         .where("orderedItem/category").equal("Laptops")
