@@ -307,18 +307,32 @@
         var self = this;
         return new Promise(function(resolve,reject) {
             try {
+                //options defaults
+                options.method = options.method || "GET";
+                options.headers = options.headers || { };
                 Args.notNull(options.url,"Request URL");
                 Args.check(!/^https?:\/\//i.test(options.url),"Request URL may not be an absolute URI");
                 Args.notNull(jQuery,"jQuery");
+                Args.check(/^GET|POST|PUT|DELETE$/i.test(options.method),"Invalid request method. Expected GET, POST, PUT or DELETE.");
                 var url_ = self.getBase() + options.url.replace(/^\//i,"");
-                jQuery.ajax({
+                //set content type
+                options.headers["Content-Type"] = "application/json";
+                var o = {
                     method:options.method || "GET",
                     url:url_,
-                    data: options.data || { },
-                    headers: options.headers || { },
-                    dataType:"json"
-                }).done(function(result) {
-                    return resolve(result)
+                    headers: options.headers,
+                    dataType:"text"
+                };
+                //set data
+                if (options.data) {
+                    o.data = /^GET$/i.test(o.method) ? options.data : JSON.stringify(options.data);
+                }
+                //execute request
+                jQuery.ajax(o).done(function(result) {
+                    if ((typeof result === 'string') && (result.length>0)) {
+                        return resolve(JSON.parse(result, dateParser));
+                    }
+                    return resolve();
                 }).fail(function(jqXHR, textStatus, errorThrown) {
                     var err = new Error(errorThrown);
                     err.code = jqXHR.status;
@@ -1287,7 +1301,7 @@
     ClientDataModel.prototype.schema = function() {
         return this.getService().execute({
             method:"GET",
-            url: TextUtils.format("/%/schema.json", this.getName())
+            url: TextUtils.format("/%s/schema.json", this.getName())
         });
     };
 
@@ -1304,7 +1318,7 @@
      * @returns {Promise|*}
      */
     ClientDataModel.prototype.save = function(obj) {
-        return this.getService().execute({ method:"POST", url:"/" + this.name + "/schema.json", data:obj });
+        return this.getService().execute({ method:"POST", url:TextUtils.format("/%s/index.json", this.getName()), data:obj });
     };
 
     /**
@@ -1312,7 +1326,7 @@
      * @returns {Promise|*}
      */
     ClientDataModel.prototype.remove = function(obj) {
-        return this.getService().execute({ method:"DELETE", url:"/" + this.name + "/index.json", data:obj });
+        return this.getService().execute({ method:"DELETE", url:TextUtils.format("/%s/index.json", this.getName()), data:obj });
     };
 
     /**
@@ -1377,6 +1391,19 @@
         return this.asQueryable().list();
     };
 
+    /**
+     * JSON DATE PARSER
+     */
+
+    var REG_DATETIME_ISO = /^(\d{4})(?:-?W(\d+)(?:-?(\d+)D?)?|(?:-(\d+))?-(\d+))(?:[T ](\d+):(\d+)(?::(\d+)(?:\.(\d+))?)?)?(?:Z(-?\d*))?([+-](\d+):(\d+))?$/;
+    function dateParser(key, value) {
+        if ((typeof value === 'string') && REG_DATETIME_ISO.test(value)) {
+            return new Date(value);
+        }
+        return value;
+    }
+
+
     if (hasModule) {
 
         /**
@@ -1434,7 +1461,7 @@
                     request.headers(options.headers);
 
                     //set query params
-                    if ((options.method==="GET") && options.data) {
+                    if (/^GET$/i.test(options.method) && options.data) {
                         request.query(options.data);
                     }
                     //or data to send
@@ -1447,7 +1474,12 @@
                             if (response.headers["set-cookie"]) {
                                 self.setCookie(response.headers["set-cookie"]);
                             }
-                            deferred.resolve(response.body);
+                            if ((typeof response.raw_body === 'string') && response.raw_body.length>0) {
+                                deferred.resolve(JSON.parse(response.raw_body, dateParser));
+                            }
+                            else {
+                                deferred.resolve();
+                            }
                         }
                         else {
                             var er = new Error(response.statusMessage);
@@ -1553,9 +1585,21 @@
                     var o = {
                         method: options.method,
                         url: url_,
-                        headers:options.headers
+                        headers:options.headers,
+                        transformResponse:function(data, headers, status) {
+                            if (typeof data === 'undefined' || data == null) {
+                                return;
+                            }
+                            if (/^application\/json/.test(headers("Content-Type"))) {
+                                if (data.length == 0) {
+                                    return;
+                                }
+                                return JSON.parse(data, dateParser);
+                            }
+                            return data;
+                        }
                     };
-                    if (/^GET$/.test(options.method)) {
+                    if (/^GET$/i.test(o.method)) {
                         o.params = options.data;
                     }
                     else {
