@@ -652,3 +652,105 @@ Ceiling:
         }).catch(function (err) {
         console.log(err);
     });
+
+#### Methods
+
+##### and(name)
+
+Prepares a logical AND expression.
+
+Parameters:
+- name: The name of field that is going to be used in this expression
+
+##### andAlso(name)
+
+Prepares a logical AND expression.
+If an expression is already defined, it will be wrapped with the new AND expression
+
+Parameters:
+- name: The name of field that is going to be used in this expression
+
+        $context.model("Product")
+            .where("category").equal("Laptops")
+            .or("category").equal("Desktops")
+            .andAlso("price").floor().lowerOrEqual(177)
+            .items()
+            .then(function (result) {
+                //
+            }).catch(function (err) {
+            console.log(err);
+        });
+
+##### expand(...attr)
+
+Parameters:
+- attr: A param array of strings which represents the field or the array of fields that are going to be expanded.
+If attr is missing then all the previously defined expandable fields will be removed
+
+Defines an attribute or an array of attributes to be expanded in the final result. This operation should be used
+when a non-expandable attribute is required to be expanded in the final result.
+
+    $context.model("Order")
+        .where("customer").equal(337)
+        .orderByDescending("orderDate")
+        .expand("customer")
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+##### first()
+
+Executes the specified query and returns the first item.
+
+    $context.model("User")
+        .where("name").equal("alexis.rees@example.com")
+        .first()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+##### item()
+
+Executes the specified query and returns the first item.
+
+    $context.model("User")
+        .where("name").equal("alexis.rees@example.com")
+        .item()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+##### items()
+
+Executes the specified query and returns an array of items.
+
+    $context.model("Product")
+        .where("category").equal("Laptops")
+        .take(10)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+##### list()
+
+Executes the specified queryand returns a result set based on the specified paging parameters.
+
+    $context.model("Product")
+        .where("category").equal("Laptops")
+        .take(10)
+        .list()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
