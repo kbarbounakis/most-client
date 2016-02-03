@@ -410,7 +410,7 @@ Between:
         console.log(err);
     });
 
-#### Aggregations
+#### Aggregate Functions
 
 Count:
 
@@ -452,3 +452,203 @@ Max:
         console.log(err);
     });
 
+### String Functions:
+
+Index Of:
+
+    $context.model("Product")
+        .where("name").indexOf("Intel")
+        .greaterOrEqual(0)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Substring:
+
+    $context.model("Product")
+        .where("name").substr(6,4)
+        .equal("Core")
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Starts with:
+
+    $context.model("Product")
+        .where("name").startsWith("Intel Core")
+        .equal(true)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Ends with:
+
+    $context.model("Product")
+        .where("name").endsWith("Edition")
+        .equal(true)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Lower case:
+
+    $context.model("Product")
+        .where("category").toLowerCase()
+        .equal("laptops")
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Upper case:
+
+    $context.model("Product")
+        .where("category").toUpperCase()
+        .equal("LAPTOPS")
+        .take(10)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+#### Date Functions:
+
+Date:
+
+    $context.model("Order")
+        .where("orderDate").getDate()
+        .equal("2015-04-18")
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Month:
+
+    $context.model("Order")
+        .where("orderDate").getMonth()
+        .equal(4)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Day:
+
+    $context.model("Order")
+        .where("orderDate").getMonth().equal(4)
+        .and("orderDate").getDay().lowerThan(15)
+        .items()
+        .then(function (result) {
+           //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Year:
+
+    $context.model("Order")
+        .where("orderDate").getMonth().equal(5)
+        .and("orderDate").getDay().lowerOrEqual(10)
+        .and("orderDate").getFullYear().equal(2015)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Hours:
+
+    $context.model("Order")
+        .where("orderDate").getMonth().equal(5)
+        .and("orderDate").getDay().lowerOrEqual(10)
+        .and("orderDate").getHours().between(10,18)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Minutes:
+
+    $context.model("Order")
+        .where("orderDate").getMonth().equal(5)
+        .and("orderDate").getHours().between(9,17)
+        .and("orderDate").getMinutes().between(1,30)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Seconds:
+
+    $context.model("Order")
+        .where("orderDate").getMonth().equal(5)
+        .and("orderDate").getHours().between(9,17)
+        .and("orderDate").getMinutes().between(1,30)
+        .and("orderDate").getSeconds().between(1,45)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+#### Math Functions
+
+Round:
+
+    $context.model("Product")
+        .where("price").round().lowerOrEqual(177)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Floor:
+
+    $context.model("Product")
+        .where("price").floor().lowerOrEqual(177)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });
+
+Ceiling:
+
+    $context.model("Product")
+        .where("price").ceil().greaterOrEqual(177)
+        .items()
+        .then(function (result) {
+            //
+        }).catch(function (err) {
+        console.log(err);
+    });

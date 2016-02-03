@@ -1145,6 +1145,14 @@
     /**
      * @returns {ClientDataQueryable}
      */
+    ClientDataQueryable.prototype.getFullYear = function() {
+        Args.notNull(this.privates_.left,"The left operand");
+        this.privates_.left = TextUtils.format('year(%s)',this.privates_.left);
+        return this;
+    };
+    /**
+     * @returns {ClientDataQueryable}
+     */
     ClientDataQueryable.prototype.getYear = function() {
         Args.notNull(this.privates_.left,"The left operand");
         this.privates_.left = TextUtils.format('year(%s)',this.privates_.left);
@@ -1190,6 +1198,14 @@
     ClientDataQueryable.prototype.substr = function(pos, length) {
         Args.notNull(this.privates_.left,"The left operand");
         this.privates_.left = TextUtils.format('substring(%s,%s,%s)',this.privates_.left, pos, length);
+        return this;
+    };
+    /**
+     * @returns {ClientDataQueryable}
+     */
+    ClientDataQueryable.prototype.ceil = function() {
+        Args.notNull(this.privates_.left,"The left operand");
+        this.privates_.left = TextUtils.format('ceiling(%s)',this.privates_.left);
         return this;
     };
     /**
