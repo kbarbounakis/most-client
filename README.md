@@ -743,14 +743,20 @@ Executes the specified query and returns an array of items.
 
 ##### list()
 
-Executes the specified queryand returns a result set based on the specified paging parameters.
+Executes the underlying query and returns a result set based on the specified paging parameters. The result set
+contains the following attributes:
 
-    $context.model("Product")
-        .where("category").equal("Laptops")
-        .take(10)
-        .list()
-        .then(function (result) {
-            //
-        }).catch(function (err) {
-        console.log(err);
-    });
+- total (number): The total number of records
+- skip (number): The number of skipped records
+- records (Array): An array of objects which represents the query results.
+
+        $context.model("Product")
+            .where("category").equal("Laptops")
+            .skip
+            .take(10)
+            .list()
+            .then(function (result) {
+                //
+            }).catch(function (err) {
+            console.log(err);
+        });
