@@ -824,7 +824,7 @@ Prepares an ascending sorting operation
                console.log(err);
             });
 
- ##### thenBy(...attr)
+##### thenBy(...attr)
 
  Continues a descending sorting operation
 
@@ -837,7 +837,7 @@ Prepares an ascending sorting operation
                 console.log(err);
              });
 
- ##### orderByDescending(...attr)
+##### orderByDescending(...attr)
 
  Prepares an descending sorting operation
 
