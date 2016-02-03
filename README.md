@@ -752,7 +752,7 @@ contains the following attributes:
 
         $context.model("Product")
             .where("category").equal("Laptops")
-            .skip
+            .skip(10)
             .take(10)
             .list()
             .then(function (result) {
@@ -760,3 +760,104 @@ contains the following attributes:
             }).catch(function (err) {
             console.log(err);
         });
+
+##### skip(val)
+
+Prepares a paging operation by skipping the specified number of records
+
+Parameters:
+- val: The number of records to be skipped
+
+         $context.model("Product")
+                 .where("category").equal("Laptops")
+                 .skip(10)
+                 .take(10)
+                 .list()
+                 .then(function (result) {
+                     //
+                 }).catch(function (err) {
+                 console.log(err);
+             });
+
+##### take(val)
+
+Prepares a data paging operation by taking the specified number of records
+
+Parameters:
+- val: The number of records to take
+
+         $context.model("Product")
+                 .where("category").equal("Laptops")
+                 .skip(10)
+                 .take(10)
+                 .list()
+                 .then(function (result) {
+                     //
+                 }).catch(function (err) {
+                 console.log(err);
+             });
+
+##### groupBy(...attr)
+
+Prepares a group by expression
+
+    $context.model("Order")
+     .select("orderedItem/model as productModel", "orderedItem/name as productName","count(id) as orderCount")
+     .where("orderDate').getFullYear().equal(2015)
+     .groupBy("orderedItem")
+     .orderByDescending("count(id)")
+     .take(5).items().then(function(result) {
+            //
+        }).catch(function(err) {
+           console.log(err);
+        });
+
+##### orderBy(...attr)
+
+Prepares an ascending sorting operation
+
+    $context.model("Product")
+         .orderBy("category","name")
+         .take(25).items().then(function(result) {
+                //
+            }).catch(function(err) {
+               console.log(err);
+            });
+
+ ##### thenBy(...attr)
+
+ Continues a descending sorting operation
+
+     $context.model("Product")
+          .orderBy("category")
+          .thenBy("name")
+          .take(25).items().then(function(result) {
+                 //
+             }).catch(function(err) {
+                console.log(err);
+             });
+
+ ##### orderByDescending(...attr)
+
+ Prepares an descending sorting operation
+
+     $context.model("Product")
+          .orderByDescending("price")
+          .take(25).items().then(function(result) {
+                 //
+             }).catch(function(err) {
+                console.log(err);
+             });
+
+##### thenByDescending(...attr)
+
+ Continues a descending sorting operation
+
+     $context.model("Product")
+          .orderBy("category")
+          .thenByDescending("price")
+          .take(25).items().then(function(result) {
+                 //
+             }).catch(function(err) {
+                console.log(err);
+             });
