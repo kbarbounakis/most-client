@@ -727,7 +727,7 @@
         var arr = [];
         delete this.$select;
         if (typeof attr === 'undefined' || attr == null) { return this; }
-        if (typeof attr ===  "[object Array]") {
+        if (Object.prototype.toString.call(attr) ===  "[object Array]") {
             return ClientDataQueryable.prototype.select.apply(this, attr);
         }
         var arg = Array.prototype.slice.call(arguments);
@@ -756,7 +756,7 @@
         var arr = [];
         delete this.$groupby;
         if (typeof attr === 'undefined' || attr == null) { return this; }
-        if (typeof attr ===  "[object Array]") {
+        if (Object.prototype.toString.call(attr) ===  "[object Array]") {
             return ClientDataQueryable.prototype.groupBy.apply(this, attr);
         }
         var arg = Array.prototype.slice.call(arguments);
@@ -785,7 +785,7 @@
         var arr = [];
         delete this.$expand;
         if (typeof attr === 'undefined' || attr == null) { return this; }
-        if (typeof attr ===  "[object Array]") {
+        if (Object.prototype.toString.call(attr) ===  "[object Array]") {
             return ClientDataQueryable.prototype.expand.apply(this, attr);
         }
         var arg = Array.prototype.slice.call(arguments);
